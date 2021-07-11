@@ -1,12 +1,12 @@
-// require packages used in the project
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
 const port = 3000
 const mongoose = require('mongoose') // 載入 mongoose
-
-// require express-handlebars here
 const exphbs = require('express-handlebars')
-const restaurantList = require('./restaurant.json')
+
+const Restaurant = require('./models/restaurant')
+const restaurants = require('./restaurant.json')
 
 mongoose.connect('mongodb://localhost/restaurant-list', { useNewUrlParser: true, useUnifiedTopology: true }) // 設定連線到 mongoD
 
@@ -30,9 +30,10 @@ app.use(express.static('public'))
 
 // routes setting
 app.get('/', (req, res) => {
-
-  // past the movie data into 'index' partial template
-  res.render('index', { restaurant: restaurantList.results })
+  Restaurant.find()
+    .lean()
+    .then(restaurants=> res.render('index', { restaurants }))
+    .catch(error => console.log(error))
 })
 
 
