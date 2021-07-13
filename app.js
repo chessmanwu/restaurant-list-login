@@ -7,6 +7,7 @@ const exphbs = require('express-handlebars')
 
 const Restaurant = require('./models/restaurant')
 // const restaurants = require('./restaurant.json')
+const restaurants = require('./restaurant.json')
 
 mongoose.connect('mongodb://localhost/restaurant-list', { useNewUrlParser: true, useUnifiedTopology: true }) // 設定連線到 mongoD
 
@@ -65,10 +66,12 @@ app.post('/restaurants', (req, res) => {
 
 
 
-app.get('/restaurants/:restaurant_id', (req, res) => {
-
-  const restaurant = restaurantList.results.find(restaurant => restaurant.id.toString() === req.params.restaurant_id)
-  res.render('show', { restaurant: restaurant })
+app.get('/restaurants/:id', (req, res) => {
+  const id = req.params.id
+  return Restaurant.findById(req.params.id)
+    .lean()
+    .then((restaurants) => res.render('show', { restaurants }))
+    .catch(error => console.log(error))
 })
 
 app.get('/search', (req, res) => {
