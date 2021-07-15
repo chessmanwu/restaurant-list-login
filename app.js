@@ -6,7 +6,6 @@ const mongoose = require('mongoose') // 載入 mongoose
 const exphbs = require('express-handlebars')
 
 const Restaurant = require('./models/restaurant')
-// const restaurants = require('./restaurant.json')
 const restaurants = require('./restaurant.json')
 
 mongoose.connect('mongodb://localhost/restaurant-list', { useNewUrlParser: true, useUnifiedTopology: true }) // 設定連線到 mongoD
@@ -21,19 +20,13 @@ db.once('open', () => {
   console.log('mongodb connected!')
 })
 
-const categories = new Set()
-Restaurant.find().lean().then((restaurants) => {
-  restaurants.forEach(restaurant =>
-    categories.add(restaurant.category))
-})
-
-
 // setting template engine
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }))
 app.set('view engine', 'handlebars')
 
 // setting static files
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.static('public'))
 
 
 // routes setting
@@ -45,7 +38,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/restaurants/new', (req, res) => {
-  return res.render('new', { category: categories })
+  return res.render('new')
 })
 
 app.post('/restaurants', (req, res) => {
@@ -58,19 +51,34 @@ app.post('/restaurants', (req, res) => {
   const google_map = req.body.google_map
   const rating = req.body.rating
   const description = req.body.description
-
+    
   return Restaurant.create({ name, name_en, category, image, location, phone, google_map, rating, description })
     .then(() => res.redirect('/'))
     .catch(error => console.log(error))
 })
 
 
-
 app.get('/restaurants/:id', (req, res) => {
-  const id = req.params.id
+  const id = req.params.idç
   return Restaurant.findById(req.params.id)
     .lean()
     .then((restaurants) => res.render('show', { restaurants }))
+    .catch(error => console.log(error))
+})
+
+app.get('/restaurants/:id/edit', (req, res) => {
+  const id = req.params.id
+  return Restaurant.findById(req.params.id)
+    .lean()
+    .then((restaurants) => res.render('edit', { restaurants }))
+    .catch(error => console.log(error))
+})
+
+app.post('/restaurants/:id/delete', (req, res) => {
+  const id = req.params.id
+  return Restaurant.findById(id)
+    .then(restaurant => restaurant.remove())
+    .then(() => res.redirect('/'))
     .catch(error => console.log(error))
 })
 
@@ -87,7 +95,6 @@ app.get('/search', (req, res) => {
   res.render('index', { restaurant: restaurant, keyword: keyword })
 })
 
-app.use(express.static('public'))
 
 // start and listen on the Express server
 app.listen(port, () => {
