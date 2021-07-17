@@ -4,9 +4,11 @@ const port = 3000
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose') // 載入 mongoose
 const exphbs = require('express-handlebars')
+const methodOverride = require('method-override')
+
 
 const Restaurant = require('./models/restaurant')
-const restaurants = require('./restaurant.json')
+const restaurantList = require('./restaurant.json')
 
 mongoose.connect('mongodb://localhost/restaurant-list', { useNewUrlParser: true, useUnifiedTopology: true }) // 設定連線到 mongoD
 
@@ -27,9 +29,9 @@ app.set('view engine', 'handlebars')
 // setting static files
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
+app.use(methodOverride('_method'))
 
 
-// routes setting
 app.get('/', (req, res) => {
   Restaurant.find()
     .lean()
@@ -37,27 +39,12 @@ app.get('/', (req, res) => {
     .catch(error => console.log(error))
 })
 
+//新增餐廳之routing
 app.get('/restaurants/new', (req, res) => {
   return res.render('new')
 })
 
-app.post('/restaurants', (req, res) => {
-  const name = req.body.name
-  const name_en = req.body.name_en
-  const category = req.body.category
-  const image = req.body.image
-  const location = req.body.location
-  const phone = req.body.phone
-  const google_map = req.body.google_map
-  const rating = req.body.rating
-  const description = req.body.description
-    
-  return Restaurant.create({ name, name_en, category, image, location, phone, google_map, rating, description })
-    .then(() => res.redirect('/'))
-    .catch(error => console.log(error))
-})
-
-
+//詳細資料之routing
 app.get('/restaurants/:id', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(req.params.id)
@@ -66,6 +53,7 @@ app.get('/restaurants/:id', (req, res) => {
     .catch(error => console.log(error))
 })
 
+//edit資料之routing
 app.get('/restaurants/:id/edit', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(req.params.id)
@@ -74,10 +62,26 @@ app.get('/restaurants/:id/edit', (req, res) => {
     .catch(error => console.log(error))
 })
 
-app.post('/restaurants/:id/edit', (req, res) => {
+//使用者填寫新餐廳，新增資料庫資料
+app.post('/restaurants', (req, res) => {
+  const name = req.body.name
+  const category = req.body.category
+  const image = req.body.image
+  const location = req.body.location
+  const phone = req.body.phone
+  const google_map = req.body.google_map
+  const rating = req.body.rating
+  const description = req.body.description
+
+  return Restaurant.create({ name, category, image, location, phone, google_map, rating, description })
+    .then(() => res.redirect('/'))
+    .catch(error => console.log(error))
+})
+
+//使用者edit餐廳，修改資料庫資料
+app.put('/restaurants/:id', (req, res) => {
   const id = req.params.id
   const name = req.body.name
-  const name_en = req.body.name_en
   const category = req.body.category
   const image = req.body.image
   const location = req.body.location
@@ -88,7 +92,6 @@ app.post('/restaurants/:id/edit', (req, res) => {
   return Restaurant.findById(id)
     .then(restaurants => {
       restaurants.name = name
-      restaurants.name_en = name_en
       restaurants.category = category
       restaurants.image = image
       restaurants.location = location
@@ -102,30 +105,28 @@ app.post('/restaurants/:id/edit', (req, res) => {
     .catch(error => console.log(error))
 })
 
-
-app.post('/restaurants/:id/delete', (req, res) => {
+//使用者delete餐廳，修改資料庫資料
+app.delete('/restaurants/:id', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(id)
-    .then(restaurant => restaurant.remove())
+    .then(restaurants => restaurants.remove())
     .then(() => res.redirect('/'))
     .catch(error => console.log(error))
 })
 
+//search function
 app.get('/search', (req, res) => {
-  console.log('req.query', req.query)
-  const keyword = req.query.keyword
-  const restaurant = restaurantList.results.filter(restaurant => {
-    return restaurant.name_en.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
-      restaurant.name.toLocaleLowerCase().includes(keyword.toLocaleLowerCase()) ||
-      restaurant.category.toLocaleLowerCase().includes(keyword.toLocaleLowerCase())
-
-  })
-
-  res.render('index', { restaurant: restaurant, keyword: keyword })
+  const keyword = req.query.keyword.toLowerCase()
+  Restaurant.find()
+    .lean()
+    .then((restaurants) => {
+      restaurants = restaurants.filter((restaurant) =>
+        restaurant.name.toLowerCase().includes(keyword) || restaurant.category.toLowerCase().includes(keyword)
+      )
+      res.render('index', { restaurants: restaurants, keyword: keyword })
+    })
 })
 
-
-// start and listen on the Express server
 app.listen(port, () => {
-  console.log(`Express is listening on localhost:${port}`)
+  console.log(`Express on localhost:${port}`)
 })

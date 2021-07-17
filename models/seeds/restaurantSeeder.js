@@ -9,7 +9,7 @@ const Restaurant = require('../restaurant')
 // 設定連線到 mongoDB
 mongoose.connect('mongodb://localhost/restaurant-list', {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 })
 
 // 取得資料庫連線狀態
@@ -32,7 +32,7 @@ db.once('open', () => {
       phone: restaurant.phone,
       google_map: restaurant.google_map,
       rating: restaurant.rating,
-      description: restaurant.description,
+      description: restaurant.description
     })
   })
   console.log('restaurantSeeder done!')
