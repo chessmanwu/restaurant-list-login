@@ -1,23 +1,9 @@
-// mongoose
-const mongoose = require('mongoose')
-// 載入 restaurant list 種子資料
 const data = require('../../restaurant.json')
 const restaurantList = data.results
-// restaurant model
 const Restaurant = require('../restaurant')
 
-// 設定連線到 mongoDB
-mongoose.connect('mongodb://localhost/restaurant-list', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+const db = require('../../config/mongoose')
 
-// 取得資料庫連線狀態
-const db = mongoose.connection
-// 連線異常
-db.on('error', () => {
-  console.log('mongodb error!')
-})
 // 連線成功
 db.once('open', () => {
   console.log('mongodb connected')
