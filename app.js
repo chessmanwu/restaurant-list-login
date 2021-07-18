@@ -18,22 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
 app.use(methodOverride('_method'))
 
-
-//search 
-app.get('/search', (req, res) => {
-  const keyword = req.query.keyword.toLowerCase()
-  Restaurant.find()
-    .lean()
-    .then((restaurants) => {
-      restaurants = restaurants.filter((restaurant) =>
-        restaurant.name.toLowerCase().includes(keyword) || restaurant.category.toLowerCase().includes(keyword)
-      )
-      res.render('index', { restaurants: restaurants, keyword: keyword })
-    })
-})
-
 app.use(routes)
-
 
 app.listen(port, () => {
   console.log(`Express on localhost:${port}`)

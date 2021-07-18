@@ -2,12 +2,12 @@ const express = require('express')
 const router = express.Router()
 const Restaurant = require('../../models/restaurant')
 
-//new routing
+// new routing
 router.get('/new', (req, res) => {
   return res.render('new')
 })
 
-//new post
+// new post
 router.post('/', (req, res) => {
   const name = req.body.name
   const category = req.body.category
@@ -23,7 +23,7 @@ router.post('/', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//detail routing
+// detail routing
 router.get('/:id', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(req.params.id)
@@ -32,7 +32,7 @@ router.get('/:id', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//edit 路由
+// edit 路由
 router.get('/:id/edit', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(req.params.id)
@@ -41,7 +41,7 @@ router.get('/:id/edit', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//使用edit，修改資料庫
+// 使用edit，修改資料庫
 router.put('/:id', (req, res) => {
   const id = req.params.id
   const name = req.body.name
@@ -68,7 +68,7 @@ router.put('/:id', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//使用delete，修改資料庫
+// 使用delete，修改資料庫
 router.delete('/:id', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(id)
