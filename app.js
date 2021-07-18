@@ -44,6 +44,22 @@ app.get('/restaurants/new', (req, res) => {
   return res.render('new')
 })
 
+//使用者填寫新餐廳，新增資料庫資料
+app.post('/restaurants', (req, res) => {
+  const name = req.body.name
+  const category = req.body.category
+  const image = req.body.image
+  const location = req.body.location
+  const phone = req.body.phone
+  const google_map = req.body.google_map
+  const rating = req.body.rating
+  const description = req.body.description
+
+  return Restaurant.create({ name, category, image, location, phone, google_map, rating, description })
+    .then(() => res.redirect('/'))
+    .catch(error => console.log(error))
+})
+
 //詳細資料之routing
 app.get('/restaurants/:id', (req, res) => {
   const id = req.params.id
@@ -62,24 +78,8 @@ app.get('/restaurants/:id/edit', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//使用者填寫新餐廳，新增資料庫資料
-app.post('/restaurants', (req, res) => {
-  const name = req.body.name
-  const category = req.body.category
-  const image = req.body.image
-  const location = req.body.location
-  const phone = req.body.phone
-  const google_map = req.body.google_map
-  const rating = req.body.rating
-  const description = req.body.description
-
-  return Restaurant.create({ name, category, image, location, phone, google_map, rating, description })
-    .then(() => res.redirect('/'))
-    .catch(error => console.log(error))
-})
-
 //使用者edit餐廳，修改資料庫資料
-app.put('/restaurants/:id', (req, res) => {
+app.post('/restaurants/:id/edit', (req, res) => {
   const id = req.params.id
   const name = req.body.name
   const category = req.body.category
@@ -106,7 +106,7 @@ app.put('/restaurants/:id', (req, res) => {
 })
 
 //使用者delete餐廳，修改資料庫資料
-app.delete('/restaurants/:id', (req, res) => {
+app.post('/restaurants/:id/delete', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(id)
     .then(restaurants => restaurants.remove())
