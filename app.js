@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose') // 載入 mongoose
 const exphbs = require('express-handlebars')
 const methodOverride = require('method-override')
+const routes = require('./routes')
 
 const Restaurant = require('./models/restaurant')
 const restaurantList = require('./restaurant.json')
@@ -30,87 +31,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
 app.use(methodOverride('_method'))
 
-app.get('/', (req, res) => {
-  Restaurant.find()
-    .lean()
-    .then(restaurants => res.render('index', { restaurants }))
-    .catch(error => console.log(error))
-})
-
-//new routing
-app.get('/restaurants/new', (req, res) => {
-  return res.render('new')
-})
-
-//new post
-app.post('/restaurants', (req, res) => {
-  const name = req.body.name
-  const category = req.body.category
-  const image = req.body.image
-  const location = req.body.location
-  const phone = req.body.phone
-  const google_map = req.body.google_map
-  const rating = req.body.rating
-  const description = req.body.description
-
-  return Restaurant.create({ name, category, image, location, phone, google_map, rating, description })
-    .then(() => res.redirect('/'))
-    .catch(error => console.log(error))
-})
-
-//detail routing
-app.get('/restaurants/:id', (req, res) => {
-  const id = req.params.id
-  return Restaurant.findById(req.params.id)
-    .lean()
-    .then((restaurants) => res.render('show', { restaurants }))
-    .catch(error => console.log(error))
-})
-
-//edit 路由
-app.get('/restaurants/:id/edit', (req, res) => {
-  const id = req.params.id
-  return Restaurant.findById(req.params.id)
-    .lean()
-    .then((restaurants) => res.render('edit', { restaurants }))
-    .catch(error => console.log(error))
-})
-
-//使用edit，修改資料庫
-app.put('/restaurants/:id', (req, res) => {
-  const id = req.params.id
-  const name = req.body.name
-  const category = req.body.category
-  const image = req.body.image
-  const location = req.body.location
-  const phone = req.body.phone
-  const google_map = req.body.google_map
-  const rating = req.body.rating
-  const description = req.body.description
-  return Restaurant.findById(id)
-    .then(restaurants => {
-      restaurants.name = name
-      restaurants.category = category
-      restaurants.image = image
-      restaurants.location = location
-      restaurants.phone = phone
-      restaurants.google_map = google_map
-      restaurants.rating = rating
-      restaurants.description = description
-      return restaurants.save()
-    })
-    .then(() => res.redirect(`/restaurants/${id}`))
-    .catch(error => console.log(error))
-})
-
-//使用delete，修改資料庫
-app.delete('/restaurants/:id', (req, res) => {
-  const id = req.params.id
-  return Restaurant.findById(id)
-    .then(restaurants => restaurants.remove())
-    .then(() => res.redirect('/'))
-    .catch(error => console.log(error))
-})
 
 //search 
 app.get('/search', (req, res) => {
@@ -124,6 +44,9 @@ app.get('/search', (req, res) => {
       res.render('index', { restaurants: restaurants, keyword: keyword })
     })
 })
+
+app.use(routes)
+
 
 app.listen(port, () => {
   console.log(`Express on localhost:${port}`)
