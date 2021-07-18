@@ -4,8 +4,6 @@ const port = 3000
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose') // 載入 mongoose
 const exphbs = require('express-handlebars')
-const methodOverride = require('method-override')
-
 
 const Restaurant = require('./models/restaurant')
 const restaurantList = require('./restaurant.json')
@@ -29,8 +27,6 @@ app.set('view engine', 'handlebars')
 // setting static files
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
-app.use(methodOverride('_method'))
-
 
 app.get('/', (req, res) => {
   Restaurant.find()
@@ -39,12 +35,12 @@ app.get('/', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//新增餐廳之routing
+//new routing
 app.get('/restaurants/new', (req, res) => {
   return res.render('new')
 })
 
-//使用者填寫新餐廳，新增資料庫資料
+//new post
 app.post('/restaurants', (req, res) => {
   const name = req.body.name
   const category = req.body.category
@@ -60,7 +56,7 @@ app.post('/restaurants', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//詳細資料之routing
+//detail routing
 app.get('/restaurants/:id', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(req.params.id)
@@ -69,7 +65,7 @@ app.get('/restaurants/:id', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//edit資料之routing
+//edit 路由
 app.get('/restaurants/:id/edit', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(req.params.id)
@@ -78,7 +74,7 @@ app.get('/restaurants/:id/edit', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//使用者edit餐廳，修改資料庫資料
+//使用edit，修改資料庫
 app.post('/restaurants/:id/edit', (req, res) => {
   const id = req.params.id
   const name = req.body.name
@@ -105,7 +101,7 @@ app.post('/restaurants/:id/edit', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//使用者delete餐廳，修改資料庫資料
+//使用delete，修改資料庫
 app.post('/restaurants/:id/delete', (req, res) => {
   const id = req.params.id
   return Restaurant.findById(id)
@@ -114,7 +110,7 @@ app.post('/restaurants/:id/delete', (req, res) => {
     .catch(error => console.log(error))
 })
 
-//search function
+//search 
 app.get('/search', (req, res) => {
   const keyword = req.query.keyword.toLowerCase()
   Restaurant.find()
