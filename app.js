@@ -1,4 +1,5 @@
 const express = require('express')
+const session = require('express-session')
 const app = express()
 const port = 3000
 const bodyParser = require('body-parser')
@@ -12,6 +13,12 @@ const Restaurant = require('./models/restaurant')
 // setting template engine
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }))
 app.set('view engine', 'handlebars')
+
+app.use(session({
+  secret: 'ThisIsMySecret',
+  resave: false,
+  saveUninitialized: true
+}))
 
 // setting static files
 app.use(bodyParser.urlencoded({ extended: true }))
