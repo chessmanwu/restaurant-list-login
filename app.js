@@ -5,8 +5,10 @@ const port = 3000
 const bodyParser = require('body-parser')
 const exphbs = require('express-handlebars')
 const methodOverride = require('method-override')
+const flash = require('connect-flash')
 const routes = require('./routes')
 const usePassport = require('./config/passport')
+
 
 require('./config/mongoose')
 
@@ -28,11 +30,13 @@ app.use(express.static('public'))
 app.use(methodOverride('_method'))
 
 usePassport(app)
-
+app.use(flash())
 app.use((req, res, next) => {
   // 可 console.log(req.user) 來觀察
   res.locals.isAuthenticated = req.isAuthenticated()
   res.locals.user = req.user
+  res.locals.success_msg = req.flash('success_msg')  
+  res.locals.warning_msg = req.flash('warning_msg')
   next()
 })
 

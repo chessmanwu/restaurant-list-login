@@ -4,11 +4,15 @@ const Restaurant = require('../../models/restaurant')
 
 // new routing
 router.get('/new', (req, res) => {
+  const userId = req.user._id
   return res.render('new')
 })
 
+
+
 // new post
 router.post('/', (req, res) => {
+  const userId = req.user._id
   const name = req.body.name
   const category = req.body.category
   const image = req.body.image
@@ -18,15 +22,16 @@ router.post('/', (req, res) => {
   const rating = req.body.rating
   const description = req.body.description
 
-  return Restaurant.create({ name, category, image, location, phone, google_map, rating, description })
+  return Restaurant.create({ name, category, image, location, phone, google_map, rating, description, userId})
     .then(() => res.redirect('/'))
     .catch(error => console.log(error))
 })
 
 // detail routing
 router.get('/:id', (req, res) => {
-  const id = req.params.id
-  return Restaurant.findById(req.params.id)
+  const userId = req.user._id
+  const _id = req.params.id
+  return Restaurant.findOne({ _id, userId })
     .lean()
     .then((restaurants) => res.render('show', { restaurants }))
     .catch(error => console.log(error))
@@ -34,8 +39,9 @@ router.get('/:id', (req, res) => {
 
 // edit 路由
 router.get('/:id/edit', (req, res) => {
-  const id = req.params.id
-  return Restaurant.findById(req.params.id)
+  const userId = req.user._id
+  const _id = req.params.id
+  return Restaurant.findOne({ _id, userId })
     .lean()
     .then((restaurants) => res.render('edit', { restaurants }))
     .catch(error => console.log(error))
@@ -43,7 +49,8 @@ router.get('/:id/edit', (req, res) => {
 
 // 使用edit，修改資料庫
 router.put('/:id', (req, res) => {
-  const id = req.params.id
+  const userId = req.user._id
+  const _id = req.params.id
   const name = req.body.name
   const category = req.body.category
   const image = req.body.image
@@ -52,7 +59,7 @@ router.put('/:id', (req, res) => {
   const google_map = req.body.google_map
   const rating = req.body.rating
   const description = req.body.description
-  return Restaurant.findById(id)
+  return Restaurant.findOne({ _id, userId })
     .then(restaurants => {
       restaurants.name = name
       restaurants.category = category
@@ -70,8 +77,9 @@ router.put('/:id', (req, res) => {
 
 // 使用delete，修改資料庫
 router.delete('/:id', (req, res) => {
-  const id = req.params.id
-  return Restaurant.findById(id)
+  const userId = req.user._id
+  const _id = req.params.id
+  return Restaurant.findOne({ _id, userId })
     .then(restaurants => restaurants.remove())
     .then(() => res.redirect('/'))
     .catch(error => console.log(error))
