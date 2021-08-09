@@ -13,8 +13,6 @@ const port = process.env.PORT
 const routes = require('./routes')
 const usePassport = require('./config/passport')
 
-
-
 require('./config/mongoose')
 
 const Restaurant = require('./models/restaurant')
@@ -40,7 +38,7 @@ app.use((req, res, next) => {
   // 可 console.log(req.user) 來觀察
   res.locals.isAuthenticated = req.isAuthenticated()
   res.locals.user = req.user
-  res.locals.success_msg = req.flash('success_msg')  
+  res.locals.success_msg = req.flash('success_msg')
   res.locals.warning_msg = req.flash('warning_msg')
   next()
 })

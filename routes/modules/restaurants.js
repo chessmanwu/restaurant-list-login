@@ -8,8 +8,6 @@ router.get('/new', (req, res) => {
   return res.render('new')
 })
 
-
-
 // new post
 router.post('/', (req, res) => {
   const userId = req.user._id
@@ -22,7 +20,7 @@ router.post('/', (req, res) => {
   const rating = req.body.rating
   const description = req.body.description
 
-  return Restaurant.create({ name, category, image, location, phone, google_map, rating, description, userId})
+  return Restaurant.create({ name, category, image, location, phone, google_map, rating, description, userId })
     .then(() => res.redirect('/'))
     .catch(error => console.log(error))
 })
